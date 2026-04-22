@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Traffic Management System</title>
+    <link rel="stylesheet" href="traffic.css">
+</head>
+<body>
+    <header>
+        <h1 style="font-size: 80px; text-align: center; border-top: 8px;  padding: 10px; background-color: green; width: 2000px; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); margin: auto;"">🚦 Traffic Management System 🚗</h1>
+        <br><br>
+        <video controls width="1200px" height="600px">
+            <video autoplay muted loop id="bg-video"></video>
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </header>
+    
+    <main>
+        <div class="container">
+            <section class="form-container">
+                <h2>Add Vehicle Details</h2>
+                <form id="vehicle-form">
+                    <input class="vehicle" type="text" id="license_plate" placeholder="License Number" required>
+                    <input class="vehicle" type="text" id="owner" placeholder="Owner Name" required>
+                    <input class="vehicle" type="text" id="vehicle_type" placeholder="Vehicle Type" required>
+                    <input class="vehicle" type="text" id="mobile_number" placeholder="Mobile number" required>
+                    <button type="submit">➕ Add Vehicle</button>
+                </form>
+            </section>
+        </div>
+        
+        <section class="vehicle-list-container">
+            <h2>📋 Stored Vehicles</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>License Plate</th>
+                        <th>Owner</th>
+                        <th>Vehicle Type</th>
+                        <th>Entry Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vehicle-list"></tbody>
+            </table>
+        </section>
+    </main>
+    
+    <footer>
+        <p>🚀 Developed for smart traffic management</p>
+    </footer>
+
+</body>
+
+<script src="app.js"></script>
+
+</html>
+
+

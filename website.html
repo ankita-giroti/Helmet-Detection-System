@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helmet Detection System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Helmet Detection System</h1>
+
+        <video id="video-feed" autoplay muted></video>
+        <br>
+        <button id="start-detection">Start Detection</button>
+
+        <div id="results">
+            <h2>Detection Results</h2>
+            <p id="result-text">No detection yet...</p>
+        </div>
+    </div>
+
+    <script>
+        const videoFeed = document.getElementById('video-feed');
+        const startDetectionButton = document.getElementById('start-detection');
+        const resultText = document.getElementById('result-text');
+
+        let stream = null;
+
+        // Access the camera
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                videoFeed.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                resultText.textContent = "Error accessing camera. Please check permissions.";
+            }
+        }
+
+        // Start and stop detection
+        startDetectionButton.addEventListener('click', async () => {
+            if (startDetectionButton.textContent === 'Start Detection') {
+                await startCamera();
+                startDetectionButton.textContent = 'Stop Detection';
+                resultText.textContent = "Detection started...";
+                startDetection(); // Call function to send frames to server
+            } else {
+                stopDetection();
+                startDetectionButton.textContent = 'Start Detection';
+                resultText.textContent = "Detection stopped.";
+                if (stream) {
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                    videoFeed.srcObject = null; // Release the camera
+                    stream = null;
+                }
+            }
+        });
+
+        let detectionInterval;
+
+        async function startDetection() {
+            detectionInterval = setInterval(async () => {
+                if (!stream) return;  // Exit if stream is not available
+
+                const canvas = document.createElement('canvas');
+                canvas.width = videoFeed.videoWidth;
+                canvas.height = videoFeed.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(videoFeed, 0, 0, canvas.width, canvas.height);
+                const imageDataURL = canvas.toDataURL('image/jpeg');
+
+                // Send the image to the server for processing
+                try {
+                    const response = await fetch('/detect-helmet', { // Replace with your server endpoint
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ image: imageDataURL })
+                    });
+
+                    const data = await response.json();
+                    resultText.textContent = data.message; // Display the result
+
+                } catch (error) {
+                    console.error("Error sending image to server:", error);
+                    resultText.textContent = "Error communicating with server.";
+                }
+            }, 1000); // Send frame every 1 second (adjust as needed)
+        }
+
+        function stopDetection() {
+            clearInterval(detectionInterval);
+        }
+    </script>
+</body>
+</html>
